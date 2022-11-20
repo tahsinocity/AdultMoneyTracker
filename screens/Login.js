@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import Toast from 'react-native-root-toast';
 import LabeledInput from '../components/LabeledInput';
 import Button from '../components/Button';
 import validator from "validator";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 
 const validateFields = (email, password) => {
   const isValid = {
@@ -23,9 +24,12 @@ const validateFields = (email, password) => {
 const createAccount = (email, password) => {
   const auth = getAuth();
   createUserWithEmailAndPassword(auth, email, password)
-    .then(({ user }) => {
-      console.log("Creating user...")
-    })
+    .then(() => Toast.show('New User Created!', {
+      duration: Toast.durations.LONG,
+      position: 0}))
+    .catch(() => Toast.show('User Already Registered!', {
+      duration: Toast.durations.LONG,
+      position: 0}))
 }
 
 const login = (email, password) => {
@@ -34,16 +38,17 @@ const login = (email, password) => {
     .then(({ user }) => {
       console.log("Signing in...")
     })
+    .catch((err) => {
+      if (err.code === "auth/wrong-password") {
+        Toast.show('Wrong Password!', {
+          duration: Toast.durations.LONG,
+          position: 0})
+      }
+    })
 }
 
-const emailResetPassword = (email) => {
-  const auth = getAuth();
-  sendPasswordResetEmail(auth, email)
-}
-
-export default function Login (){
+export default function Login ({ route, navigation }){
   const [isCreateMode, setCreateMode] = useState(false);
-  const [resetPassword, setResetPassword] = useState(false);
   const [emailField, setEmailField] = useState({
     text: "",
     errorMessage: ""
@@ -71,7 +76,7 @@ export default function Login (){
           errorMessage={emailField.errorMessage}
           labelStyle={styles.label}
         />
-        {!resetPassword && <LabeledInput
+        <LabeledInput
           label="Password"
           text={passwordField.text}
           onChangeText={(text) => {
@@ -80,8 +85,8 @@ export default function Login (){
           errorMessage={passwordField.errorMessage}
           labelStyle={styles.label}
           secureTextEntry={true}
-        />}
-        {isCreateMode && !resetPassword && <LabeledInput
+        />
+        {isCreateMode && <LabeledInput
           label="Re-enter Password"
           text={passwordReentryField.text}
           onChangeText={(text) => {
@@ -94,7 +99,6 @@ export default function Login (){
         <TouchableOpacity
           onPress={() => {
             setCreateMode(!isCreateMode)
-            setResetPassword(false)
           }}
         >
           <Text style={{alignSelf: "center", color: "blue", fontSize: 16, margin: 4}}>
@@ -103,12 +107,11 @@ export default function Login (){
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            setResetPassword(!resetPassword)
-            setCreateMode(false)
+            navigation.navigate("ResetPassword")
           }}
         >
           <Text style={{alignSelf: "center", color: "blue", fontSize: 16, margin: 4}}>
-            {!resetPassword ? "Forgot Password" : "Login"}
+            Forgot Password?
           </Text>
         </TouchableOpacity>
       </View>
@@ -116,16 +119,6 @@ export default function Login (){
         onPress={() => {
           const isValid = validateFields(emailField.text, passwordField.text);
           let isAllValid = true;
-
-          if(isValid.email && resetPassword) {
-            const auth = getAuth();
-            sendPasswordResetEmail(auth, emailField.text)
-              .then(() => console.log('Password link sent...'))
-              .catch(() => {
-                emailField.errorMessage = "Email does not exist"
-                setEmailField({...emailField})
-              })
-          }
 
           if (!isValid.email) {
             emailField.errorMessage = "Please enter a valid email"
@@ -145,12 +138,12 @@ export default function Login (){
             isAllValid = false
           }
 
-          if(isAllValid && !resetPassword) {
+          if(isAllValid) {
             isCreateMode ? createAccount(emailField.text, passwordField.text) : login(emailField.text, passwordField.text);
           }
         }}
         buttonStyle={{backgroundColor: "blue"}}
-        text={(isCreateMode && !resetPassword) ? "Create Account" : resetPassword ? "Send Email" : "Login"}
+        text={isCreateMode ? "Create Account" : "Login"}
       />
     </View>
   )

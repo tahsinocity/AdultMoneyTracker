@@ -5,6 +5,7 @@ import { getAuth } from "firebase/auth";
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack'
 import { NavigationContainer } from '@react-navigation/native';
+import { RootSiblingParent } from 'react-native-root-siblings';
 import { firebaseConfig } from './config'
 
 import Home from './screens/Home';
@@ -13,6 +14,7 @@ import Itemized from './screens/Itemized';
 import Settings from './screens/Settings';
 import Transactions from './screens/Transactions';
 import Login from './screens/Login';
+import ResetPassword from './screens/ResetPassword';
 
 
 const Drawer = createDrawerNavigator();
@@ -20,7 +22,8 @@ const AuthStack = createStackNavigator();
 
 const AuthScreens = () => (
   <AuthStack.Navigator>
-    <AuthStack.Screen name="Login" component={Login}/>
+    <AuthStack.Screen name="Login" component={Login} options={{ headerShown: false }}/>
+    <AuthStack.Screen name="ResetPassword" component={ResetPassword} options={{ headerShown: false }}/>
   </AuthStack.Navigator>
 )
 
@@ -53,9 +56,11 @@ export default function App() {
   }, [])
 
   return (
-    <NavigationContainer>
-      {isAuthenticated ? <Screens/> : <AuthScreens/>}
-    </NavigationContainer>
+    <RootSiblingParent>
+      <NavigationContainer>
+        {isAuthenticated ? <Screens/> : <AuthScreens/>}
+      </NavigationContainer>
+    </RootSiblingParent>
   );
 }
 
