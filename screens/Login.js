@@ -5,6 +5,7 @@ import LabeledInput from '../components/LabeledInput';
 import Button from '../components/Button';
 import validator from "validator";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 
 const validateFields = (email, password) => {
   const isValid = {
@@ -23,10 +24,15 @@ const validateFields = (email, password) => {
 
 const createAccount = (email, password) => {
   const auth = getAuth();
+  const db = getFirestore();
+
   createUserWithEmailAndPassword(auth, email, password)
-    .then(() => Toast.show('New User Created!', {
+    .then(({user}) => {
+      setDoc(doc(db, "users", user.uid ),{})
+      Toast.show('New User Created!', {
       duration: Toast.durations.LONG,
-      position: 0}))
+      position: 0})
+    })
     .catch(() => Toast.show('User Already Registered!', {
       duration: Toast.durations.LONG,
       position: 0}))
@@ -41,6 +47,11 @@ const login = (email, password) => {
     .catch((err) => {
       if (err.code === "auth/wrong-password") {
         Toast.show('Wrong Password!', {
+          duration: Toast.durations.LONG,
+          position: 0})
+      }
+      if (err.code === "auth/user-not-found") {
+        Toast.show('User Not Found', {
           duration: Toast.durations.LONG,
           position: 0})
       }
