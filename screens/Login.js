@@ -1,12 +1,168 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import LabeledInput from '../components/LabeledInput';
+import Button from '../components/Button';
+import validator from "validator";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 
-const Login = () => {
+const validateFields = (email, password) => {
+  const isValid = {
+    email: validator.isEmail(email),
+    password: validator.isStrongPassword(password, {
+      minLength: 8,
+      misLowercase: 1,
+      minUppercase: 1,
+      minNumber: 1,
+      minSymbols: 1
+    })
+  }
+
+  return isValid
+}
+
+const createAccount = (email, password) => {
+  const auth = getAuth();
+  createUserWithEmailAndPassword(auth, email, password)
+    .then(({ user }) => {
+      console.log("Creating user...")
+    })
+}
+
+const login = (email, password) => {
+  const auth = getAuth();
+  signInWithEmailAndPassword(auth, email, password)
+    .then(({ user }) => {
+      console.log("Signing in...")
+    })
+}
+
+const emailResetPassword = (email) => {
+  const auth = getAuth();
+  sendPasswordResetEmail(auth, email)
+}
+
+export default function Login (){
+  const [isCreateMode, setCreateMode] = useState(false);
+  const [resetPassword, setResetPassword] = useState(false);
+  const [emailField, setEmailField] = useState({
+    text: "",
+    errorMessage: ""
+
+  });
+  const [passwordField, setPasswordField] = useState({
+    text: "",
+    errorMessage: ""
+  });
+  const [passwordReentryField, setPasswordReentryField] = useState({
+    text: "",
+    errorMessage: ""
+  });
+
   return (
-    <View>
-      <Text>Login</Text>
+    <View style={styles.container}>
+      <Text style={styles.header}>Adult Money Tracker</Text>
+      <View style={{flex: 1}}>
+        <LabeledInput
+          label="Email"
+          text={emailField.text}
+          onChangeText={(text) => {
+            setEmailField({text})
+          }}
+          errorMessage={emailField.errorMessage}
+          labelStyle={styles.label}
+        />
+        {!resetPassword && <LabeledInput
+          label="Password"
+          text={passwordField.text}
+          onChangeText={(text) => {
+            setPasswordField({text})
+          }}
+          errorMessage={passwordField.errorMessage}
+          labelStyle={styles.label}
+          secureTextEntry={true}
+        />}
+        {isCreateMode && !resetPassword && <LabeledInput
+          label="Re-enter Password"
+          text={passwordReentryField.text}
+          onChangeText={(text) => {
+            setPasswordReentryField({text})
+          }}
+          errorMessage={passwordReentryField.errorMessage}
+          labelStyle={styles.label}
+          secureTextEntry={true}
+        />}
+        <TouchableOpacity
+          onPress={() => {
+            setCreateMode(!isCreateMode)
+            setResetPassword(false)
+          }}
+        >
+          <Text style={{alignSelf: "center", color: "blue", fontSize: 16, margin: 4}}>
+            {isCreateMode ? "Already have an account?" : "Create Account"}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            setResetPassword(!resetPassword)
+            setCreateMode(false)
+          }}
+        >
+          <Text style={{alignSelf: "center", color: "blue", fontSize: 16, margin: 4}}>
+            {!resetPassword ? "Forgot Password" : "Login"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <Button
+        onPress={() => {
+          const isValid = validateFields(emailField.text, passwordField.text);
+          let isAllValid = true;
+
+          if(isValid.email && resetPassword) {
+            const auth = getAuth();
+            sendPasswordResetEmail(auth, emailField.text)
+              .then(() => console.log('Password link sent...'))
+              .catch(() => {
+                emailField.errorMessage = "Email does not exist"
+                setEmailField({...emailField})
+              })
+          }
+
+          if (!isValid.email) {
+            emailField.errorMessage = "Please enter a valid email"
+            setEmailField({...emailField})
+            isAllValid = false;
+          }
+
+          if(!isValid.password) {
+            passwordField.errorMessage = "Password must be at least 8 long with numbers, uppercase, lowercase and symbols."
+            setPasswordField({...passwordField})
+            isAllValid = false
+          }
+
+          if(isCreateMode && passwordReentryField.text !== passwordField.text) {
+            passwordReentryField.errorMessage = "Passwords do not match"
+            setPasswordReentryField({...passwordReentryField})
+            isAllValid = false
+          }
+
+          if(isAllValid && !resetPassword) {
+            isCreateMode ? createAccount(emailField.text, passwordField.text) : login(emailField.text, passwordField.text);
+          }
+        }}
+        buttonStyle={{backgroundColor: "blue"}}
+        text={(isCreateMode && !resetPassword) ? "Create Account" : resetPassword ? "Send Email" : "Login"}
+      />
     </View>
   )
 }
 
-export default Login
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    justifyContent: "space-between",
+    alignItems: "stretch"
+  },
+  label : { fontSize: 16, fontWeight: "bold", color: "black" },
+  header : { fontSize: 42, color: "blue", alignSelf: "center" }
+})
