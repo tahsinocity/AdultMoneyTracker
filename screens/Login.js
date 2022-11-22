@@ -76,7 +76,7 @@ export default function Login ({ route, navigation }){
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Adult Money Tracker</Text>
+      <Text style={styles.header}>budgetMe</Text>
       <View style={{flex: 1}}>
         <LabeledInput
           label="Email"

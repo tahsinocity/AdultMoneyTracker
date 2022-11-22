@@ -24,7 +24,7 @@ export default function ResetPassword ({ navigation }){
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Adult Money Tracker</Text>
+      <Text style={styles.header}>budgetMe</Text>
       <Text style={{alignSelf: "center", color: "blue", fontSize: 16, margin: 4}}>
         Password Reset
       </Text>
