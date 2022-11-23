@@ -25,8 +25,7 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 8,
     marginBottom: 32,
-    margin: 4,
-    fontFamily: 'Poppins-Regular'
+    margin: 4
   },
   labelContainer: { flexDirection: "row", marginBottom: 4 },
   error: {

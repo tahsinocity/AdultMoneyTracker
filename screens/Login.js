@@ -77,11 +77,14 @@ export default function Login ({ route, navigation }){
 
   return (
     <View style={styles.container}>
-      <View style={{flex: 1, alignSelf: "center"}}>
-        <Image
-          style={{width: 350, height: 200, resizeMode: 'contain'}}
-          source={require('../assets/login-banner.png')}
-        />
+      <Image
+        style={{width: 250, height: 150, resizeMode: 'contain', alignSelf: "center", marginTop: 50 }}
+        source={require('../assets/login-banner.png')}
+      />
+      <View style={{flex: 1}}>
+        <Text style={{alignSelf: "center", color: Colors.gray, fontSize: 18, marginBottom: 24}}>
+          Login
+        </Text>
         <LabeledInput
           label="Email"
           text={emailField.text}
@@ -111,54 +114,58 @@ export default function Login ({ route, navigation }){
           labelStyle={styles.label}
           secureTextEntry={true}
         />}
-        <TouchableOpacity
+        <View style={{flexDirection: "row", alignSelf: "center"}}>
+          <TouchableOpacity
+            onPress={() => {
+              setCreateMode(!isCreateMode)
+            }}
+          >
+            <Text style={{alignSelf: "center", color: Colors.gray, fontSize: 14, margin: 4}}>
+              {isCreateMode ? "Already have an account?" : "Create Account"}
+            </Text>
+          </TouchableOpacity>
+          <Text style={{alignSelf: "center", color: Colors.gray, fontSize: 16, margin: 4}}>|</Text>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("ResetPassword")
+            }}
+          >
+            <Text style={{alignSelf: "center", color: Colors.gray, fontSize: 14, margin: 4}}>
+              Forgot Password?
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <Button
           onPress={() => {
-            setCreateMode(!isCreateMode)
+            const isValid = validateFields(emailField.text, passwordField.text);
+            let isAllValid = true;
+
+            if (!isValid.email) {
+              emailField.errorMessage = "Please enter a valid email"
+              setEmailField({...emailField})
+              isAllValid = false;
+            }
+
+            if(!isValid.password) {
+              passwordField.errorMessage = "Password must be at least 8 long with numbers, uppercase, lowercase and symbols."
+              setPasswordField({...passwordField})
+              isAllValid = false
+            }
+
+            if(isCreateMode && passwordReentryField.text !== passwordField.text) {
+              passwordReentryField.errorMessage = "Passwords do not match"
+              setPasswordReentryField({...passwordReentryField})
+              isAllValid = false
+            }
+
+            if(isAllValid) {
+              isCreateMode ? createAccount(emailField.text, passwordField.text) : login(emailField.text, passwordField.text);
+            }
           }}
-        >
-          <Text style={{alignSelf: "center", color: Colors.gray, fontSize: 16, margin: 4}}>
-            {isCreateMode ? "Already have an account?" : "Create Account"}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("ResetPassword")
-          }}
-        >
-          <Text style={{alignSelf: "center", color: Colors.gray, fontSize: 16, margin: 4}}>
-            Forgot Password?
-          </Text>
-        </TouchableOpacity>
+          text={isCreateMode ? "Create Account" : "Login"}
+          buttonStyle={{marginTop: 50}}
+        />
       </View>
-      <Button
-        onPress={() => {
-          const isValid = validateFields(emailField.text, passwordField.text);
-          let isAllValid = true;
-
-          if (!isValid.email) {
-            emailField.errorMessage = "Please enter a valid email"
-            setEmailField({...emailField})
-            isAllValid = false;
-          }
-
-          if(!isValid.password) {
-            passwordField.errorMessage = "Password must be at least 8 long with numbers, uppercase, lowercase and symbols."
-            setPasswordField({...passwordField})
-            isAllValid = false
-          }
-
-          if(isCreateMode && passwordReentryField.text !== passwordField.text) {
-            passwordReentryField.errorMessage = "Passwords do not match"
-            setPasswordReentryField({...passwordReentryField})
-            isAllValid = false
-          }
-
-          if(isAllValid) {
-            isCreateMode ? createAccount(emailField.text, passwordField.text) : login(emailField.text, passwordField.text);
-          }
-        }}
-        text={isCreateMode ? "Create Account" : "Login"}
-      />
     </View>
   )
 }
