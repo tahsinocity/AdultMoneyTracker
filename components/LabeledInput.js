@@ -1,4 +1,5 @@
 import { StyleSheet, View, Text, TextInput } from "react-native";
+import Colors from "../constants/Colors";
 
 
 export default function LabeledInput({ labelStyle, label, errorMessage, inputStyle, text, onChangeText, ...inputProps }) {
@@ -23,7 +24,9 @@ export default function LabeledInput({ labelStyle, label, errorMessage, inputSty
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 8,
-    margin: 4
+    marginBottom: 32,
+    margin: 4,
+    fontFamily: 'Poppins-Regular'
   },
   labelContainer: { flexDirection: "row", marginBottom: 4 },
   error: {
@@ -32,11 +35,11 @@ const styles = StyleSheet.create({
     marginLeft: 4
   },
   input: {
-    borderBottomColor: "gray",
+    borderBottomColor: Colors.gray,
     borderBottomWidth: 1,
     paddingLeft: 4,
     height: 32,
     fontSize: 24,
-    color: "black"
+    color: Colors.gray
   }
 })

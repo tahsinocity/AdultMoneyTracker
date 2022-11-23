@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import Toast from 'react-native-root-toast';
 import LabeledInput from '../components/LabeledInput';
 import Button from '../components/Button';
 import validator from "validator";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
+import Colors from "../constants/Colors";
 
 const validateFields = (email, password) => {
   const isValid = {
@@ -76,8 +77,11 @@ export default function Login ({ route, navigation }){
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>budgetMe</Text>
-      <View style={{flex: 1}}>
+      <View style={{flex: 1, alignSelf: "center"}}>
+        <Image
+          style={{width: 350, height: 200, resizeMode: 'contain'}}
+          source={require('../assets/login-banner.png')}
+        />
         <LabeledInput
           label="Email"
           text={emailField.text}
@@ -112,7 +116,7 @@ export default function Login ({ route, navigation }){
             setCreateMode(!isCreateMode)
           }}
         >
-          <Text style={{alignSelf: "center", color: "blue", fontSize: 16, margin: 4}}>
+          <Text style={{alignSelf: "center", color: Colors.gray, fontSize: 16, margin: 4}}>
             {isCreateMode ? "Already have an account?" : "Create Account"}
           </Text>
         </TouchableOpacity>
@@ -121,7 +125,7 @@ export default function Login ({ route, navigation }){
             navigation.navigate("ResetPassword")
           }}
         >
-          <Text style={{alignSelf: "center", color: "blue", fontSize: 16, margin: 4}}>
+          <Text style={{alignSelf: "center", color: Colors.gray, fontSize: 16, margin: 4}}>
             Forgot Password?
           </Text>
         </TouchableOpacity>
@@ -153,7 +157,6 @@ export default function Login ({ route, navigation }){
             isCreateMode ? createAccount(emailField.text, passwordField.text) : login(emailField.text, passwordField.text);
           }
         }}
-        buttonStyle={{backgroundColor: "blue"}}
         text={isCreateMode ? "Create Account" : "Login"}
       />
     </View>
@@ -163,10 +166,10 @@ export default function Login ({ route, navigation }){
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: Colors.navyBlue,
     justifyContent: "space-between",
     alignItems: "stretch"
   },
-  label : { fontSize: 16, fontWeight: "bold", color: "black" },
-  header : { fontSize: 42, color: "blue", alignSelf: "center" }
+  label : { fontSize: 16, fontWeight: "bold", color: Colors.gray },
+  header : { fontSize: 42, color: Colors.gray, alignSelf: "center" }
 })

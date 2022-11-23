@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import Colors from "../constants/Colors";
 
 export default function Button({buttonStyle, textStyle, onPress, text}) {
   return (
@@ -16,11 +17,11 @@ const styles = StyleSheet.create({
   button: {
     flexDirection: "row",
     borderRadius: 25,
-    backgroundColor: "gray",
+    backgroundColor: Colors.gray,
     height: 48,
     margin: 16,
     justifyContent: "center",
     alignItems: "center"
   },
-  text: { color: "white", fontSize: 24, fontWeight: "bold" }
+  text: { color: Colors.darkBlue, fontSize: 24, fontWeight: "bold" }
 })
