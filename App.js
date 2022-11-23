@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import 'react-native-gesture-handler';
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack'
 import { NavigationContainer } from '@react-navigation/native';
 import { RootSiblingParent } from 'react-native-root-siblings';
-import { firebaseConfig } from './config'
+import { auth } from './config'
 
 import Home from './screens/Home';
 import History from './screens/History';
@@ -39,7 +37,6 @@ const Screens = () => (
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const auth = getAuth()
   useEffect(() => {
     if(auth.currentUser) {
       setIsAuthenticated(true)
@@ -63,5 +60,3 @@ export default function App() {
     </RootSiblingParent>
   );
 }
-
-initializeApp(firebaseConfig);

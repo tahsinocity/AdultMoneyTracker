@@ -6,13 +6,22 @@ export default function Settings({ navigation }) {
   return (
     <View style={styles.container}>
       <Formik
-        initialValues={{monthlyIncome: '', rent: '', loan: '', retirement: ''}}
-        onSubmit={() => {
-          navigation.navigate('Home')
+        initialValues={{displayName: '',monthlyIncome: 0, rent: 0, loan: 0, retirement: 0}}
+        onSubmit={({ displayName, monthlyIncome, rent, loan, retirement }) => {
+          let x = [monthlyIncome, rent, loan, retirement].reduce((a, b) => parseInt(a) + parseInt(b), 0)
+          navigation.navigate('Home', {
+            totals: x
+          })
         }}
       >
         {(props) => (
           <View>
+            <TextInput
+              placeholder='Display Name'
+              onChangeText={props.handleChange('displayName')}
+              value={props.displayName}
+            />
+
             <TextInput
               placeholder='Monthly Income'
               onChangeText={props.handleChange('monthlyIncome')}

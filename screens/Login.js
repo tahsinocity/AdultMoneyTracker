@@ -4,8 +4,9 @@ import Toast from 'react-native-root-toast';
 import LabeledInput from '../components/LabeledInput';
 import Button from '../components/Button';
 import validator from "validator";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../config";
 import Colors from "../constants/Colors";
 
 const validateFields = (email, password) => {
@@ -23,24 +24,32 @@ const validateFields = (email, password) => {
   return isValid
 }
 
-const createAccount = (email, password) => {
-  const auth = getAuth();
-  const db = getFirestore();
-
-  createUserWithEmailAndPassword(auth, email, password)
+const createAccount = async (email, password, displayName) => {
+  try {
+    await createUserWithEmailAndPassword(auth, email, password)
     .then(({user}) => {
       setDoc(doc(db, "users", user.uid ),{})
       Toast.show('New User Created!', {
-      duration: Toast.durations.LONG,
-      position: 0})
+        duration: Toast.durations.LONG,
+        position: 0
+      })
     })
-    .catch(() => Toast.show('User Already Registered!', {
-      duration: Toast.durations.LONG,
-      position: 0}))
+    .catch((err) =>
+      Toast.show('User Already Registered!', {
+        duration: Toast.durations.LONG,
+        position: 0
+      })
+    );
+
+    await updateProfile(auth.currentUser, { displayName: displayName }).catch(
+      (err) => console.log(err)
+    );
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 const login = (email, password) => {
-  const auth = getAuth();
   signInWithEmailAndPassword(auth, email, password)
     .then(({ user }) => {
       console.log("Signing in...")
@@ -74,6 +83,7 @@ export default function Login ({ route, navigation }){
     text: "",
     errorMessage: ""
   });
+  const [displayName, setDisplayName] = useState('');
 
   return (
     <View style={styles.container}>
@@ -104,7 +114,8 @@ export default function Login ({ route, navigation }){
           labelStyle={styles.label}
           secureTextEntry={true}
         />
-        {isCreateMode && <LabeledInput
+        {isCreateMode &&
+          <LabeledInput
           label="Re-enter Password"
           text={passwordReentryField.text}
           onChangeText={(text) => {
@@ -113,7 +124,16 @@ export default function Login ({ route, navigation }){
           errorMessage={passwordReentryField.errorMessage}
           labelStyle={styles.label}
           secureTextEntry={true}
-        />}
+          />
+        }
+        {isCreateMode &&
+          <LabeledInput
+          label="Display Name"
+          text={displayName}
+          onChangeText={text => setDisplayName(text)}
+          labelStyle={styles.label}
+          />
+        }
         <View style={{flexDirection: "row", alignSelf: "center"}}>
           <TouchableOpacity
             onPress={() => {
@@ -159,7 +179,7 @@ export default function Login ({ route, navigation }){
             }
 
             if(isAllValid) {
-              isCreateMode ? createAccount(emailField.text, passwordField.text) : login(emailField.text, passwordField.text);
+              isCreateMode ? createAccount(emailField.text, passwordField.text, displayName) : login(emailField.text, passwordField.text);
             }
           }}
           text={isCreateMode ? "Create Account" : "Login"}
