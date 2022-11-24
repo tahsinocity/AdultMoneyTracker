@@ -1,21 +1,48 @@
-import { View, Text, Button } from 'react-native'
-import React from 'react'
-import { auth } from "../config";
+import { View, Text, StyleSheet } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { db, auth } from '../config';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { signOut } from "firebase/auth";
+import Colors from "../constants/Colors";
+import Button from "../components/Button";
 
-const Home = ({ route, navigation }) => {
+export default function Home ({ route, navigation }) {
+  const [totalLeft, setTotalLeft] = useState(0)
   const currentUserDisplayName = auth.currentUser?.displayName;
-  const totalLeft = route.params?.totals
+  const currentUserUID = auth.currentUser.uid;
+  const docRef = doc(db, "users", currentUserUID);
+
+  useEffect(() => {
+    const unsub = onSnapshot(docRef, (docSnap) => {
+      if(docSnap.exists()){
+        let data = docSnap.data();
+        setTotalLeft(data.totals)
+      }
+    })
+
+    return () => unsub();
+  }, [])
+
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Welcome back {currentUserDisplayName}!</Text>
-      <Text>You have:</Text>
-      <Text>$ {totalLeft}</Text>
-      <Text>Left for November</Text>
-      <Button title="Enter New Transactions" onPress={() => navigation.navigate('Transactions')} />
-      <Button title="Sign out" onPress={() => signOut(auth)} />
+    <View style={styles.container}>
+      <Text style={styles.text}>Welcome back {currentUserDisplayName}!</Text>
+      <Text style={styles.text}>You have:</Text>
+      <Text style={styles.text}>$ {totalLeft}</Text>
+      <Text style={styles.text}>Left for November</Text>
+      <Button text="Enter New Transactions" onPress={() => navigation.navigate('Transactions')} />
+      <Button text="Sign out" onPress={() => signOut(auth)} />
     </View>
   )
 }
 
-export default Home
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.navyBlue,
+    justifyContent: "center",
+    alignItems: "stretch"
+  },
+  label : { fontSize: 16, fontWeight: "bold", color: Colors.gray },
+  header : { fontSize: 42, color: Colors.gray, alignSelf: "center" },
+  text : {alignSelf: "center", color: Colors.gray, fontSize: 36}
+})
