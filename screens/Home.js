@@ -32,7 +32,7 @@ export default function Home ({ route, navigation }) {
       <Text style={styles.text}>Welcome back {currentUserDisplayName}!</Text>
       <Text style={styles.text}>You have:</Text>
       <Text style={styles.text}>$ {totalLeft}</Text>
-      <Text style={styles.text}>Left for November</Text>
+      <Text style={styles.text}>Left for {(new Date()).toLocaleString('default', { month: 'long' })}</Text>
       <Button text="Enter New Transactions" onPress={() => navigation.navigate('New Transaction')} />
       <Button text="Sign out" onPress={() => signOut(auth)} />
     </View>
