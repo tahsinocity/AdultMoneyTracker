@@ -74,10 +74,15 @@ export default function Settings({ navigation }) {
         />
         <Button
           onPress={() => {
-            let x = [monthlyIncome, rent, loan, retirement]
-            let totals = [monthlyIncome, rent, loan, retirement].reduce((a, b) => parseInt(a) + parseInt(b), 0)
+            let definiteExpenses = [rent, loan, retirement].reduce((a, b) => parseInt(a) + parseInt(b), 0)
+            let leftOverSpending = monthlyIncome - definiteExpenses
             setDoc(doc(db, "users", auth.currentUser.uid ),{
-              monthlyIncome, rent, loan, retirement, totals
+              monthlyIncome,
+              rent,
+              loan,
+              retirement,
+              originalTotal: leftOverSpending,
+              modifiedTotal: leftOverSpending
             })
             if (displayName) {
               updateProfile(auth.currentUser, { displayName: displayName }).catch(

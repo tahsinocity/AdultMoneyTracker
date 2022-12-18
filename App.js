@@ -10,7 +10,7 @@ import Home from './screens/Home';
 import History from './screens/History';
 import Itemized from './screens/Itemized';
 import Settings from './screens/Settings';
-import Transactions from './screens/Transactions';
+import NewTransaction from './screens/NewTransaction';
 import Login from './screens/Login';
 import ResetPassword from './screens/ResetPassword';
 
@@ -28,7 +28,7 @@ const AuthScreens = () => (
 const Screens = () => (
   <Drawer.Navigator initialRouteName="Home">
     <Drawer.Screen name="Home" component={Home} />
-    <Drawer.Screen name="Transactions" component={Transactions} />
+    <Drawer.Screen name="New Transaction" component={NewTransaction} />
     <Drawer.Screen name="Itemized" component={Itemized} />
     <Drawer.Screen name="History" component={History} />
     <Drawer.Screen name="Settings" component={Settings} />

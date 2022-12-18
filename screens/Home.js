@@ -16,7 +16,7 @@ export default function Home ({ route, navigation }) {
     const unsub = onSnapshot(docRef, (docSnap) => {
       if(docSnap.exists()){
         let data = docSnap.data();
-        setTotalLeft(data.totals)
+        setTotalLeft(data.modifiedTotal)
       }
     })
 
@@ -29,7 +29,7 @@ export default function Home ({ route, navigation }) {
       <Text style={styles.text}>You have:</Text>
       <Text style={styles.text}>$ {totalLeft}</Text>
       <Text style={styles.text}>Left for November</Text>
-      <Button text="Enter New Transactions" onPress={() => navigation.navigate('Transactions')} />
+      <Button text="Enter New Transactions" onPress={() => navigation.navigate('New Transaction')} />
       <Button text="Sign out" onPress={() => signOut(auth)} />
     </View>
   )

@@ -6,7 +6,7 @@ import LabeledInput from '../components/LabeledInput';
 import Colors from "../constants/Colors";
 import Button from "../components/Button";
 
-export default function Transactions({ navigation }) {
+export default function NewTransaction({ navigation }) {
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState(0);
   const [split, setSplit] = useState(0);
@@ -16,7 +16,7 @@ export default function Transactions({ navigation }) {
     <View style={styles.container}>
       <View style={{flex: 1}}>
         <Text style={{alignSelf: "center", color: Colors.gray, fontSize: 24, marginBottom: 24, marginTop: 50}}>
-          How much did you spend today?
+          Enter a New Transaction:
         </Text>
         <LabeledInput
           label="Description"
@@ -27,14 +27,14 @@ export default function Transactions({ navigation }) {
         <LabeledInput
           label="Amount"
           text={amount}
-          onChangeText={text => setAmount(parseInt(text))}
+          onChangeText={num => setAmount(num)}
           labelStyle={styles.label}
           keyboardType='numeric'
         />
         <LabeledInput
           label="Split?"
           text={split}
-          onChangeText={text => setSplit(parseInt(text))}
+          onChangeText={num => setSplit(num)}
           labelStyle={styles.label}
           keyboardType='numeric'
         />
@@ -51,7 +51,7 @@ export default function Transactions({ navigation }) {
             const dbRef = doc(db, "users", auth.currentUser.uid);
             const colRef = collection(dbRef, 'transactions');
             await updateDoc(dbRef, {
-              totals: increment(-totalSpent)
+              modifiedTotal: increment(-totalSpent)
             })
             await addDoc(colRef, {
               description,
