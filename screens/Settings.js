@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import { db, auth } from '../config';
-import { doc, setDoc, onSnapshot } from 'firebase/firestore';
+import { doc, setDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { updateProfile } from "firebase/auth";
 import LabeledInput from '../components/LabeledInput';
 import Colors from "../constants/Colors";
@@ -73,16 +73,15 @@ export default function Settings({ navigation }) {
           keyboardType='numeric'
         />
         <Button
-          onPress={() => {
+          onPress={async () => {
             let definiteExpenses = [rent, loan, retirement].reduce((a, b) => parseInt(a) + parseInt(b), 0)
             let leftOverSpending = monthlyIncome - definiteExpenses
-            setDoc(doc(db, "users", auth.currentUser.uid ),{
+            await updateDoc(doc(db, "users", auth.currentUser.uid ),{
               monthlyIncome,
               rent,
               loan,
               retirement,
-              originalTotal: leftOverSpending,
-              modifiedTotal: leftOverSpending
+              originalTotal: leftOverSpending
             })
             if (displayName) {
               updateProfile(auth.currentUser, { displayName: displayName }).catch(

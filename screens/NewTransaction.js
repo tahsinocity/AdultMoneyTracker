@@ -51,7 +51,7 @@ export default function NewTransaction({ navigation }) {
             const dbRef = doc(db, "users", auth.currentUser.uid);
             const colRef = collection(dbRef, 'transactions');
             await updateDoc(dbRef, {
-              modifiedTotal: increment(-totalSpent)
+              newTransationTotal: increment(totalSpent)
             })
             await addDoc(colRef, {
               description,

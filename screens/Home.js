@@ -16,7 +16,11 @@ export default function Home ({ route, navigation }) {
     const unsub = onSnapshot(docRef, (docSnap) => {
       if(docSnap.exists()){
         let data = docSnap.data();
-        setTotalLeft(data.modifiedTotal)
+        if(data.newTransationTotal) {
+          setTotalLeft(data.originalTotal - data.newTransationTotal)
+        } else {
+          setTotalLeft(data.originalTotal)
+        }
       }
     })
 
